@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Système de cotisations - Prototype Front-end</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f4f6fb;--card:#ffffff;--muted:#6b7280;--accent:#2563eb;--glass:rgba(255,255,255,0.6)}
+    *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Arial;margin:0}
+    body{background:linear-gradient(180deg,#eef2ff,#f8fafc);min-height:100vh;color:#0f172a}
+    .container{max-width:1100px;margin:28px auto;padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    header h1{font-size:18px}
+    .top-actions{display:flex;gap:8px}
+    button{background:var(--accent);color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
+    .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:16px}
+
+    /* member list and forms */
+    .member-list{max-height:420px;overflow:auto}
+    .member{display:flex;justify-content:space-between;padding:8px 6px;border-bottom:1px solid #eef2ff}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* responsive */
+    @media (max-width:880px){.grid{grid-template-columns:1fr} .top-actions{flex-wrap:wrap}}
+
+    /* small forms */
+    form{display:flex;flex-direction:column;gap:8px}
+    input,select{padding:10px;border-radius:8px;border:1px solid #e6eef8}
+    .row{display:flex;gap:8px}
+    .row > *{flex:1}
+
+    /* table */
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #f1f5f9;text-align:left}
+    th{font-weight:600;color:#0b1220}
+
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+
+    .pill{background:#eef2ff;padding:6px 8px;border-radius:999px;font-weight:600;color:#174ea6}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>cotisations en ligne de Insa Mbaye</h1>
+      <div class="top-actions">
+        <button id="btn-register">S'inscrire</button>
+        <button id="btn-login">Se connecter</button>
+        <button id="btn-admin">Espace Admin</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <h2>Tableau de bord</h2>
+          <p class="muted">Vue synthétique des cotisations</p>
+          <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
+            <div class="card" style="padding:12px;flex:1;text-align:center">
+              <div class="muted">Total encaissé</div>
+              <div style="font-size:20px;font-weight:700;margin-top:6px">€ <span id="total-collected">0.00</span></div>
+            </div>
+            <div class="card" style="padding:12px;width:150px;text-align:center">
+              <div class="muted">Taux de paiement</div>
+              <div style="font-size:18px;font-weight:700;margin-top:6px"><span id="pay-rate">0</span>%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:12px">
+          <h3>Membres</h3>
+          <p class="muted">Liste des membres enregistrés</p>
+          <div class="member-list" id="member-list"></div>
+        </div>
+
+        <div class="card">
+          <h3>Historique des paiements</h3>
+          <div id="payments-area" style="margin-top:12px;overflow:auto;max-height:260px">
+            <table id="payments-table"><thead><tr><th>Date</th><th>Membre</th><th>Montant</th><th>Méthode</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <aside>
+        <div class="card" style="margin-bottom:12px">
+          <h3>Mon espace (simulation)</h3>
+          <div id="user-area" style="margin-top:8px">
+            <p class="muted">Aucun membre connecté</p>
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <button id="btn-pay-now">Payer une cotisation</button>
+              <button id="btn-download">Télécharger reçu</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:12px">
+          <h3>Administration rapide</h3>
+          <p class="muted">Ajouter un membre (admin)</p>
+          <form id="add-member-form">
+            <input type="text" id="m-name" placeholder="Nom complet" required />
+            <input type="email" id="m-email" placeholder="Email" required />
+            <div class="row"><input type="text" id="m-phone" placeholder="Téléphone" /><select id="m-role"><option value="member">Membre</option><option value="admin">Admin</option></select></div>
+            <div style="display:flex;gap:8px"><input type="number" id="m-amount" placeholder="Premier montant (€)" /><button type="submit">Ajouter</button></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Export & Rapports</h3>
+          <p class="muted">Exporter les données ou générer un PDF (simulé)</p>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+            <button id="export-csv">Exporter membres (CSV)</button>
+            <button id="export-pay">Exporter paiements (CSV)</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="muted">Prototype front‑end — Pas de paiements réels. Pour vrai paiement, intégration back‑end + API opérateur nécessaire.</footer>
+  </div>
+
+  <!-- Simple modals (register/login/admin) -->
+  <div id="modal" style="position:fixed;inset:0;background:rgba(2,6,23,0.5);display:none;align-items:center;justify-content:center;padding:12px">
+    <div class="card" style="width:420px;max-width:96%">
+      <div id="modal-content"></div>
+      <div style="text-align:right;margin-top:12px"><button id="modal-close">Fermer</button></div>
+    </div>
+  </div>
+
+  <script>
+    /* Simple localStorage-based prototype -- NOT production secure */
+    const state = {
+      members: JSON.parse(localStorage.getItem('members')||'[]'),
+      payments: JSON.parse(localStorage.getItem('payments')||'[]'),
+      currentUser: null
+    }
+
+    // helpers
+    function save(){localStorage.setItem('members',JSON.stringify(state.members));localStorage.setItem('payments',JSON.stringify(state.payments))}
+    function uid(){return 'id_'+Math.random().toString(36).slice(2,9)}
+    function formatCurrency(v){return Number(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+    // initial demo data if empty
+    if(state.members.length===0){
+      state.members.push({id:uid(),name:'Mamadou Diallo',email:'mamadou@example.com',phone:'+221700000001',role:'member',balance:0})
+      state.members.push({id:uid(),name:'Awa Ndiaye',email:'awa@example.com',phone:'+221700000002',role:'member',balance:0})
+      state.members.push({id:uid(),name:'Admin Test',email:'admin@example.com',phone:'',role:'admin',balance:0})
+      save()
+    }
+
+    // UI renderers
+    function renderMembers(){
+      const el=document.getElementById('member-list');el.innerHTML=''
+      state.members.forEach(m=>{
+        const div=document.createElement('div');div.className='member'
+        div.innerHTML=`<div><strong>${m.name}</strong><div class='muted'>${m.email} • ${m.role}</div></div><div style='text-align:right'><div class='muted'>Solde: € ${formatCurrency(m.balance||0)}</div><div style='margin-top:6px'><button data-id='${m.id}' class='btn-pay small'>Payer</button> <button data-id='${m.id}' class='btn-delete small' style='background:#ef4444'>Suppr</button></div></div>`
+        el.appendChild(div)
+      })
+      // attach listeners
+      document.querySelectorAll('.btn-pay').forEach(b=>b.addEventListener('click',e=>openPayModal(e.target.dataset.id)))
+      document.querySelectorAll('.btn-delete').forEach(b=>b.addEventListener('click',e=>{if(confirm('Supprimer ce membre ?')){state.members=state.members.filter(x=>x.id!==e.target.dataset.id);save();renderAll()}}))
+    }
+
+    function renderPayments(){
+      const tbody=document.querySelector('#payments-table tbody');tbody.innerHTML=''
+      state.payments.slice().reverse().forEach(p=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${new Date(p.date).toLocaleString()}</td><td>${p.name}</td><td>€ ${formatCurrency(p.amount)}</td><td>${p.method}</td>`
+        tbody.appendChild(tr)
+      })
+    }
+
+    function renderStats(){
+      const total = state.payments.reduce((s,p)=>s+Number(p.amount),0)
+      document.getElementById('total-collected').textContent=formatCurrency(total)
+      const paidCount = new Set(state.payments.map(p=>p.memberId)).size
+      const membersCount = state.members.filter(m=>m.role==='member').length||1
+      document.getElementById('pay-rate').textContent = Math.round((paidCount/membersCount)*100)
+    }
+
+    function renderUserArea(){
+      const area=document.getElementById('user-area');
+      if(!state.currentUser){area.innerHTML='<p class="muted">Aucun membre connecté</p><div style="margin-top:8px;display:flex;gap:8px"><button id="btn-sim-login">Se connecter</button></div>'
+        document.getElementById('btn-sim-login')?.addEventListener('click',()=>openLogin())
+      } else {
+        area.innerHTML=`<div><strong>${state.currentUser.name}</strong><div class='muted'>${state.currentUser.email}</div></div><div style='margin-top:8px'><div class='muted'>Solde: € ${formatCurrency(state.currentUser.balance||0)}</div><div style='display:flex;gap:8px;margin-top:8px'><button id='user-pay'>Payer</button><button id='user-logout' style='background:#ef4444'>Déconnexion</button></div></div>`
+        document.getElementById('user-pay').addEventListener('click',()=>openPayModal(state.currentUser.id))
+        document.getElementById('user-logout').addEventListener('click',()=>{state.currentUser=null;renderAll()})
+      }
+    }
+
+    function renderAll(){renderMembers();renderPayments();renderStats();renderUserArea()}
+
+    // modal helpers
+    const modal=document.getElementById('modal');const modalContent=document.getElementById('modal-content');
+    function showModal(html){modalContent.innerHTML=html;modal.style.display='flex';}
+    function closeModal(){modal.style.display='none';modalContent.innerHTML=''}
+    document.getElementById('modal-close').addEventListener('click',closeModal)
+
+    // register/login/admin
+    document.getElementById('btn-register').addEventListener('click',()=>{
+      showModal(`<h3>Inscription</h3><form id='reg-form'><input placeholder='Nom complet' id='r-name' required><input placeholder='Email' id='r-email' type='email' required><input placeholder='Téléphone' id='r-phone'><div style='display:flex;gap:8px;margin-top:8px'><button>Valider</button></div></form>`)
+      document.getElementById('reg-form').addEventListener('submit',e=>{e.preventDefault();const name=document.getElementById('r-name').value;const email=document.getElementById('r-email').value;const phone=document.getElementById('r-phone').value;const m={id:uid(),name,email,phone,role:'member',balance:0};state.members.push(m);save();closeModal();alert('Inscription réussie — vous pouvez vous connecter');renderAll()})
+    })
+
+    function openLogin(){
+      showModal(`<h3>Connexion</h3><form id='login-form'><input id='l-email' placeholder='Email' required type='email'><div style='display:flex;gap:8px;margin-top:8px'><button>Se connecter</button></div></form>`)
+      document.getElementById('login-form').addEventListener('submit',e=>{e.preventDefault();const email=document.getElementById('l-email').value;const user=state.members.find(m=>m.email.toLowerCase()===email.toLowerCase());if(!user){alert('Utilisateur non trouvé');return}state.currentUser=user;closeModal();renderAll()})
+    }
+    document.getElementById('btn-login').addEventListener('click',openLogin)
+
+    // Admin quick login (no password) -> in production always secure
+    document.getElementById('btn-admin').addEventListener('click',()=>{
+      const admin = state.members.find(m=>m.role==='admin')
+      if(!admin){alert('Aucun admin trouvé') ; return}
+      state.currentUser=admin;alert('Connecté en tant qu\'admin (simulation)');renderAll()
+    })
+
+    // Add member form
+    document.getElementById('add-member-form').addEventListener('submit',e=>{
+      e.preventDefault();const name=document.getElementById('m-name').value;const email=document.getElementById('m-email').value;const phone=document.getElementById('m-phone').value;const role=document.getElementById('m-role').value;const amount=Number(document.getElementById('m-amount').value||0);
+      const m={id:uid(),name,email,phone,role,balance:amount};state.members.push(m);save();renderAll();e.target.reset()
+    })
+
+    // Payment flow (simulated)
+    function openPayModal(memberId){
+      const member = state.members.find(m=>m.id===memberId)
+      if(!member){alert('Membre introuvable');return}
+      showModal(`<h3>Paiement — ${member.name}</h3>
+        <form id='pay-form'>
+          <input id='pay-amount' type='number' placeholder='Montant (€)' required />
+          <select id='pay-method'><option>Carte bancaire</option><option>Mobile Money</option><option>PayPal</option><option>Espèces</option></select>
+          <div style='display:flex;gap:8px;margin-top:8px'><button>Valider paiement</button></div>
+        </form>`)
+      document.getElementById('pay-form').addEventListener('submit',e=>{
+        e.preventDefault();const amount=Number(document.getElementById('pay-amount').value);const method=document.getElementById('pay-method').value;
+        // simulate success
+        const p={id:uid(),memberId:member.id,name:member.name,amount,method,date:new Date().toISOString()}
+        state.payments.push(p);member.balance=(member.balance||0)+amount;save();closeModal();renderAll();alert('Paiement enregistré (simulation)');
+      })
+    }
+
+    // Download receipt for last payment by current user
+    document.getElementById('btn-download').addEventListener('click',()=>{
+      if(!state.currentUser){alert('Connectez‑vous pour télécharger un reçu');return}
+      const paymentsBy = state.payments.filter(p=>p.memberId===state.currentUser.id)
+      if(paymentsBy.length===0){alert('Aucun paiement trouvé pour ce membre');return}
+      const last = paymentsBy[paymentsBy.length-1]
+      const text = `Reçu de paiement\nNom: ${last.name}\nMontant: € ${formatCurrency(last.amount)}\nDate: ${new Date(last.date).toLocaleString()}\nMéthode: ${last.method}\nRéf: ${last.id}`
+      const blob = new Blob([text],{type:'text/plain'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`recu_${last.id}.txt`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)
+    })
+
+    // Pay now generic
+    document.getElementById('btn-pay-now').addEventListener('click',()=>{
+      if(!state.members.length){alert('Aucun membre');return}
+      openPayModal(state.members[0].id)
+    })
+
+    // Exports
+    function toCSV(rows, cols){const header=cols.join(',')+'\n';const body=rows.map(r=>cols.map(c=>`"${(r[c]||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');return header+body}
+    document.getElementById('export-csv').addEventListener('click',()=>{
+      const cols=['id','name','email','phone','role','balance'];const csv=toCSV(state.members,cols);const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='membres.csv';document.body.appendChild(a);a.click();a.remove()
+    })
+    document.getElementById('export-pay').addEventListener('click',()=>{
+      const cols=['id','memberId','name','amount','method','date'];const csv=toCSV(state.payments,cols);const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='paiements.csv';document.body.appendChild(a);a.click();a.remove()
+    })
+
+    // small UI polish for buttons inside generated lists (event delegation isn't necessary here)
+    document.addEventListener('click',e=>{
+      if(e.target.matches('button.small')) e.target.style.padding='6px 8px'
+    })
+
+    // initial render
+    renderAll()
+
+    // notes in console for developer
+    console.log('Prototype front-end chargé. Rappels : \n- Aucun paiement réel n\'est effectué.\n- Pour production, il faut ajouter un back-end sécurisé, base de données, et intégrer les API de paiement (Stripe, Orange Money, Wave, etc.).')
+  </script>
+</body>
+</html>
